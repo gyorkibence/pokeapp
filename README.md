@@ -1,5 +1,10 @@
 # Pokeapp
 
+## Environment variables 
+
+- Create .env file.
+- Add ```REACT_APP_API_URL = https://pokeapi.co/api/v2```
+
 ## Available Scripts
 
 In the project directory, you can run:
