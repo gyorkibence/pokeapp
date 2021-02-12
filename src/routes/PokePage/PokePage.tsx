@@ -1,24 +1,17 @@
-import React, { FC, useEffect } from 'react';
-import { useDispatch, useSelector, RootStateOrAny } from 'react-redux';
-import { getPokemon, selectPokemon } from 'actions/appActions';
+import React, { useEffect } from 'react';
 import { history } from 'services/config';
+import { observer } from 'mobx-react';
 import Card from 'components/Card/Card';
 import { Spin, Button } from 'antd';
+import { useStores } from 'store/useStore';
 import './poke-page.scss';
+import { GET_POKEMON } from 'queries';
+import { useQuery } from '@apollo/client';
 
-const PokePage: FC = ({ match }: any) => {
-  const dispatch = useDispatch();
-
-  const {
-    selectedPokemon,
-    selectedPokemons,
-    pokemonLoading,
-  } = useSelector((state: RootStateOrAny) => state.app);
-
-  useEffect(() => {
-    dispatch(getPokemon(match.params.name));
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
+const PokePage = observer(({ match }: any) => {
+  const { appStore } = useStores();
+  const { selectedPokemons, selectPokemon } = appStore;
+  const { loading: pokemonLoading, data: selectedPokemon } = useQuery(GET_POKEMON, { variables: { name: match.params.name } });
   return (
     <div className="poke-page">
       <div className="button-container">
@@ -35,22 +28,22 @@ const PokePage: FC = ({ match }: any) => {
         )
       }
       {
-        selectedPokemon && !pokemonLoading && (
+        selectedPokemon?.pokemon && !pokemonLoading && (
           <div className="page-container">
             <Card
-              name={selectedPokemon.name}
-              preview={selectedPokemon.sprites.other['official-artwork'].front_default}
-              weight={selectedPokemon.weight}
-              height={selectedPokemon.height}
-              abilities={selectedPokemon.abilities
-                .filter((ability: { is_hidden: boolean }) => !ability.is_hidden)
-                .map((item: { ability: { name: string }}) => item.ability.name).join(', ')}
-              selected={selectedPokemons.find((item: string) => item === selectedPokemon.name)}
+              name={selectedPokemon.pokemon.name}
+              preview={selectedPokemon.pokemon.sprites.front_default}
+              weight={selectedPokemon.pokemon.weight}
+              height={selectedPokemon.pokemon.height}
+              abilities={selectedPokemon.pokemon.abilities
+                .filter((ability: { is_hidden: boolean }) => !ability.is_hidden)
+                .map((item: { ability: { name: string } }) => item.ability.name).join(', ')}
+              selected={!!selectedPokemons.find((item: string) => item === selectedPokemon.pokemon.name)}
             />
             <div className="button-container">
-              <Button onClick={() => { dispatch(selectPokemon(selectedPokemon.name)); }} style={{ minWidth: 100 }}>
+              <Button onClick={() => { selectPokemon(selectedPokemon.pokemon.name); }} style={{ minWidth: 100 }}>
                 {
-                  selectedPokemons.find((item: string) => item === selectedPokemon.name)
+                  selectedPokemons.find((item: string) => item === selectedPokemon.pokemon.name)
                     ? 'Release'
                     : 'Catch'
                 }
@@ -61,6 +54,6 @@ const PokePage: FC = ({ match }: any) => {
       }
     </div>
   );
-};
+});
 
 export default PokePage;

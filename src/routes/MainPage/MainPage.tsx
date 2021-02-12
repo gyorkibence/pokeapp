@@ -1,29 +1,18 @@
-import React, { FC, useEffect, useState } from 'react';
-import { useDispatch, useSelector, RootStateOrAny } from 'react-redux';
+import React, { useEffect, useState } from 'react';
 import { Spin, Checkbox } from 'antd';
-import { getTypes, getNames } from 'actions/appActions';
+import { observer } from 'mobx-react';
+import { useStores } from 'store/useStore';
+import { useQuery } from '@apollo/client';
+import { GET_TYPES } from 'queries';
 import Select from 'components/Select/Select';
 import List from 'components/List/List';
 import './main-page.scss';
 
-const MainPage: FC = () => {
-  const dispatch = useDispatch();
+const MainPage = observer((props: any) => {
   const [own, setOwn] = useState(false);
-
-  const {
-    loading,
-    types,
-    namesLoading,
-    names,
-    selectedPokemons,
-  } = useSelector((state: RootStateOrAny) => state.app);
-
-  useEffect(() => {
-    if (!types) {
-      dispatch(getTypes());
-    }
-  }, [dispatch]); // eslint-disable-line react-hooks/exhaustive-deps
-
+  const { appStore } = useStores();
+  const { loading, data: types } = useQuery(GET_TYPES);
+  const { namesLoading, names, selectedPokemons, getNames } = appStore;
   return (
     <div className="main-page">
       <div className="main-title">Pokemon application</div>
@@ -36,13 +25,13 @@ const MainPage: FC = () => {
         types && (
           <>
             <Select
-              onChange={(url: string) => { dispatch(getNames(url)); }}
-              data={types}
+              onChange={(url: string) => { getNames(url); }}
+              data={types.types.results || []}
               placeholder="Select pokemon type"
             />
             <Checkbox onChange={(e) => { setOwn(e.target.checked); }}>
               Own pokemons
-            </Checkbox>
+              </Checkbox>
           </>
         )
       }
@@ -77,6 +66,6 @@ const MainPage: FC = () => {
       }
     </div>
   );
-};
+});
 
 export default MainPage;

@@ -1,23 +1,23 @@
 import React, { FC } from 'react';
 import { setConfig } from 'react-hot-loader';
-import { Provider, RootStateOrAny } from 'react-redux';
 import { Router } from 'react-router-dom';
-import { hot } from 'react-hot-loader/root';
+import { ApolloProvider } from '@apollo/client';
 import App from 'components/App/App';
+import client from 'client';
+import { hot } from 'react-hot-loader/root';
 
 setConfig({ trackTailUpdates: false });
 
 type RootProps = {
-  store: RootStateOrAny;
   history: any;
 };
 
-export const Root: FC<RootProps> = ({ store, history }) => (
-  <Provider store={store}>
+export const Root: FC<RootProps> = ({ history }) => (
+  <ApolloProvider client={client}>
     <Router history={history}>
       <App />
     </Router>
-  </Provider>
+  </ApolloProvider>
 );
 
 export default hot(Root);

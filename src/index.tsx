@@ -1,6 +1,5 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import store from 'store';
 import { history } from 'services/config';
 import Root from 'components/App/Root';
 import reportWebVitals from './reportWebVitals';
@@ -8,7 +7,7 @@ import './index.scss';
 
 ReactDOM.render(
   <React.StrictMode>
-    <Root store={store} history={history} />
+    <Root history={history} />
   </React.StrictMode>,
   document.getElementById('root')
 );
